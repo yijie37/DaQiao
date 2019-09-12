@@ -1,17 +1,5 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-//extern crate parity_codec as codec;
-//extern crate sr_primitives as runtime_primitives;
-//extern crate srml_support as support;
-//extern crate srml_system as system;
-//extern crate sr_std as rstd;
-//
-//use rstd::prelude::*;
-//use parity_codec::{Encode, Decode};
-//use support::{decl_module, decl_storage, decl_event, StorageValue, StorageMap, dispatch::Result, Parameter, ensure};
-//use runtime_primitives::traits::{Bounded, CheckedSub, CheckedAdd, Member, SimpleArithmetic, As, One};
-//use system::ensure_signed;
-
 extern crate srml_support as support;
 extern crate sr_primitives as runtime_primitives;
 extern crate parity_codec;
@@ -20,26 +8,21 @@ extern crate sr_std;
 
 
 use support::{decl_module, decl_storage, decl_event, StorageMap, StorageValue, dispatch::Result, Parameter, ensure};
-use runtime_primitives::traits::{SimpleArithmetic, Bounded, One, CheckedAdd, CheckedSub, Zero, As, Member};
+use runtime_primitives::traits::{SimpleArithmetic, Bounded, One, CheckedAdd, CheckedSub, As, Member};
 use parity_codec::{Encode, Decode};
 use system::ensure_signed;
 use sr_std::prelude::*;
 
-//pub type Symbol = Vec<u8>;
-//pub type TokenDesc = Vec<u8>;
-
 /// The module's configuration trait.
 pub trait Trait: system::Trait {
   type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
-//  type Symbol: Codec + Default + Copy;
-//  type TokenDesc: Codec + Default + Copy;
   type TokenId: Parameter + Default + Bounded + SimpleArithmetic;
   type TokenBalance: Parameter + Member + SimpleArithmetic + Default + Copy + As<usize> + As<u64>;
 }
 
 type Symbol = Vec<u8>;
 type TokenDesc = Vec<u8>;
-// struct to store the token details
+
 #[derive(Encode, Decode, Default, Clone, PartialEq, Debug)]
 pub struct Erc20MintableBurnable<T> {
   name: Vec<u8>,
@@ -47,15 +30,12 @@ pub struct Erc20MintableBurnable<T> {
   total_supply: T,
 }
 
-/// This module's storage items.
 decl_storage! {
   trait Store for Module<T: Trait> as Tokens {
-    // token id nonce for storing the next token id available for token initialization
-      // inspired by the AssetId in the SRML assets module
       TokenID get(token_id): T::TokenId;
-      // details of the token corresponding to a token id
-      TokenTabel get(token_details): map T::TokenId => Erc20MintableBurnable<T::TokenBalance>; //T::Symbol;
-      // balances mapping for an account and token
+      
+      TokenTabel get(token_details): map T::TokenId => Erc20MintableBurnable<T::TokenBalance>;
+      
       BalanceOf get(balance_of): map (T::TokenId, T::AccountId) => T::TokenBalance;
   }
 }
@@ -180,14 +160,14 @@ impl<T: Trait> Module<T> {
   }
   
   fn _mint(token_id: T::TokenId, owner: T::AccountId, value: T::TokenBalance) -> Result {
-    Self::_add_token_to_owner(token_id.clone(), owner, value.clone());
-    Self::_add_token_to_total_supply(token_id, value);
+    Self::_add_token_to_owner(token_id.clone(), owner, value.clone())?;
+    Self::_add_token_to_total_supply(token_id, value)?;
     Ok(())
   }
   
   fn _burn(token_id: T::TokenId, owner: T::AccountId, value: T::TokenBalance) -> Result {
-    Self::_sub_token_from_owner(token_id.clone(), owner, value.clone());
-    Self::_sub_token_from_total_supply(token_id, value);
+    Self::_sub_token_from_owner(token_id.clone(), owner, value.clone())?;
+    Self::_sub_token_from_total_supply(token_id, value)?;
     Ok(())
   }
 }

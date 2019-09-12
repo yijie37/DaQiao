@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies.sr-std]
 git = "https://github.com/paritytech/substrate"
-rev = 'fc206f3a009b64fc746202e5b4c701bf7e24d1f1'
+rev = 'cc1d67e973fd02c0c997b164ba516cf041bf21f1'
 default_features = false
 
 [dependencies.parity-codec]

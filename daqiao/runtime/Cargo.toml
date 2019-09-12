@@ -23,7 +23,7 @@ package = 'srml-consensus'
 rev = 'cc1d67e973fd02c0c997b164ba516cf041bf21f1'
 
 [dependencies.consensus-aura]
-default_features = false
+default_features = false #
 git = 'https://github.com/paritytech/substrate.git'
 package = 'substrate-consensus-aura-primitives'
 rev = 'cc1d67e973fd02c0c997b164ba516cf041bf21f1'
@@ -35,13 +35,13 @@ package = 'substrate-consensus-authorities'
 rev = 'cc1d67e973fd02c0c997b164ba516cf041bf21f1'
 
 [dependencies.executive]
-default_features = false
+default_features = false #
 git = 'https://github.com/paritytech/substrate.git'
 package = 'srml-executive'
 rev = 'cc1d67e973fd02c0c997b164ba516cf041bf21f1'
 
 [dependencies.indices]
-default_features = false
+default_features = false #
 git = 'https://github.com/paritytech/substrate.git'
 package = 'srml-indices'
 rev = 'cc1d67e973fd02c0c997b164ba516cf041bf21f1'
@@ -53,7 +53,7 @@ package = 'substrate-offchain-primitives'
 rev = 'cc1d67e973fd02c0c997b164ba516cf041bf21f1'
 
 [dependencies.parity-codec]
-default-features = false
+default-features = false #
 features = ['derive']
 version = '3.5'
 
@@ -121,6 +121,7 @@ package = 'sr-version'
 rev = 'cc1d67e973fd02c0c997b164ba516cf041bf21f1'
 
 [dependencies.qrml-tokens]
+default_features = false
 path = '../qrml/tokens'
 
 [features]

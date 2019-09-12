@@ -1,3 +1,4 @@
+
 extern crate qrml_tokens as tokens;
 
 use support::{decl_module, decl_storage, decl_event, StorageMap, dispatch::Result, ensure};
@@ -61,7 +62,7 @@ decl_module! {
 decl_event!(
   pub enum Event<T> where AccountId = <T as system::Trait>::AccountId, Balance = <T as tokens::Trait>::TokenBalance {
     Pledged(ChainId, Hash, AccountId, Balance),
-    WithDrawn(ChainId, Hash, AccountId, Balance),
+    Withdrawn(ChainId, Hash, AccountId, Balance),
   }
 );
 
@@ -76,7 +77,7 @@ impl<T: Trait> Module<T> {
   }
   
   
-  pub fn _pledge(origin: T::Origin, chain_id: ChainId, _ext_txid: Hash, value: T::TokenBalance) -> Result {
+  pub fn _pledge(origin: T::Origin, chain_id: ChainId, ext_txid: Hash, value: T::TokenBalance) -> Result {
     let sender = ensure_signed(origin)?;
     let token_id = match Self::chain_token(chain_id.clone()) {
       Some(t) => t,
@@ -85,11 +86,12 @@ impl<T: Trait> Module<T> {
     
     // TODO 验证外链ex_txid
     
-    <tokens::Module<T>>::mint(token_id.clone(), sender, value)?;
+    <tokens::Module<T>>::mint(token_id.clone(), sender.clone(), value)?;
+    Self::deposit_event(RawEvent::Pledged(chain_id, ext_txid, sender, value));
     Ok(())
   }
   
-  pub fn _withdraw(origin: T::Origin, chain_id: ChainId, _ex_txid: Hash, value: T::TokenBalance) -> Result {
+  pub fn _withdraw(origin: T::Origin, chain_id: ChainId, ext_txid: Hash, value: T::TokenBalance) -> Result {
     let sender = ensure_signed(origin) ?;
     let token_id = match Self::chain_token(chain_id.clone()) {
       Some(t) => t,
@@ -102,7 +104,8 @@ impl<T: Trait> Module<T> {
     
     // TODO 提现到外链
   
-    <tokens::Module<T>>::burn(token_id, sender, value)?;
+    <tokens::Module<T>>::burn(token_id, sender.clone(), value)?;
+    Self::deposit_event(RawEvent::Withdrawn(chain_id, ext_txid, sender, value));
     Ok(())
   }
 }
