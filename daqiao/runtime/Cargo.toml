@@ -120,6 +120,9 @@ git = 'https://github.com/paritytech/substrate.git'
 package = 'sr-version'
 rev = 'cc1d67e973fd02c0c997b164ba516cf041bf21f1'
 
+[dependencies.qrml-tokens]
+path = '../qrml/tokens'
+
 [features]
 default = ['std']
 std = [
@@ -142,6 +145,7 @@ std = [
     'safe-mix/std',
     'consensus-aura/std',
     'offchain-primitives/std',
+    'qrml-tokens/std'
 ]
 
 [package]

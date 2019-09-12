@@ -66,6 +66,14 @@ git = 'https://github.com/paritytech/substrate.git'
 package = 'substrate-transaction-pool'
 rev = 'cc1d67e973fd02c0c997b164ba516cf041bf21f1'
 
+[dependencies.srml-support]
+git = "https://github.com/paritytech/substrate"
+rev = 'cc1d67e973fd02c0c997b164ba516cf041bf21f1'
+#default-features = false
+
+[dependencies.qrml-tokens]
+path = './qrml/tokens'
+
 [[bin]]
 name = 'daqiao'
 path = 'src/main.rs'
