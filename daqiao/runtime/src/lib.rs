@@ -213,7 +213,7 @@ construct_runtime!(
     Indices: indices,
     Balances: balances,
     Sudo: sudo,
-    TokenBalances: tokens::{Module, Call, Storage, Event<T>},
+    Tokens: tokens::{Module, Call, Storage, Event<T>},
     Daqiao: daqiao::{Module, Call, Storage, Event<T>},
   }
 );

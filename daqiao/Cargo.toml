@@ -33,9 +33,6 @@ git = 'https://github.com/paritytech/substrate.git'
 package = 'substrate-network'
 rev = 'cc1d67e973fd02c0c997b164ba516cf041bf21f1'
 
-[dependencies.daqiao-runtime]
-path = 'runtime'
-
 [dependencies.primitives]
 git = 'https://github.com/paritytech/substrate.git'
 package = 'substrate-primitives'
@@ -66,13 +63,12 @@ git = 'https://github.com/paritytech/substrate.git'
 package = 'substrate-transaction-pool'
 rev = 'cc1d67e973fd02c0c997b164ba516cf041bf21f1'
 
-[dependencies.srml-support]
-git = "https://github.com/paritytech/substrate"
-rev = 'cc1d67e973fd02c0c997b164ba516cf041bf21f1'
-#default-features = false
-
 [dependencies.qrml-tokens]
 path = './qrml/tokens'
+default-features = false
+
+[dependencies.daqiao-runtime]
+path = 'runtime'
 
 [[bin]]
 name = 'daqiao'
