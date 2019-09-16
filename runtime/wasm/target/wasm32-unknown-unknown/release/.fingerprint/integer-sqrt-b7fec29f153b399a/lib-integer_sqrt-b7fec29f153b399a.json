@@ -1,1 +1,0 @@
-{"rustc":998934970289666173,"features":"[]","target":18157994981450072458,"profile":10515832472908933917,"path":7229439135538891726,"deps":[],"local":[{"CheckDepInfo":{"dep_info":"wasm32-unknown-unknown/release/.fingerprint/integer-sqrt-b7fec29f153b399a/dep-lib-integer_sqrt-b7fec29f153b399a"}}],"rustflags":["-C","link-arg=--export-table"],"metadata":5811360243748669490}
