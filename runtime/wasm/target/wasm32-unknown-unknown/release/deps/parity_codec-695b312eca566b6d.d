@@ -1,0 +1,10 @@
+/home/yijie/files/proj/bc/substrate/DaQiao/daqiao/runtime/wasm/target/wasm32-unknown-unknown/release/deps/parity_codec-695b312eca566b6d.rmeta: /home/yijie/.cargo/registry/src/mirrors.ustc.edu.cn-61ef6e0cd06fb9b8/parity-codec-3.5.4/src/lib.rs /home/yijie/.cargo/registry/src/mirrors.ustc.edu.cn-61ef6e0cd06fb9b8/parity-codec-3.5.4/src/codec.rs /home/yijie/.cargo/registry/src/mirrors.ustc.edu.cn-61ef6e0cd06fb9b8/parity-codec-3.5.4/src/joiner.rs /home/yijie/.cargo/registry/src/mirrors.ustc.edu.cn-61ef6e0cd06fb9b8/parity-codec-3.5.4/src/keyedvec.rs
+
+/home/yijie/files/proj/bc/substrate/DaQiao/daqiao/runtime/wasm/target/wasm32-unknown-unknown/release/deps/libparity_codec-695b312eca566b6d.rlib: /home/yijie/.cargo/registry/src/mirrors.ustc.edu.cn-61ef6e0cd06fb9b8/parity-codec-3.5.4/src/lib.rs /home/yijie/.cargo/registry/src/mirrors.ustc.edu.cn-61ef6e0cd06fb9b8/parity-codec-3.5.4/src/codec.rs /home/yijie/.cargo/registry/src/mirrors.ustc.edu.cn-61ef6e0cd06fb9b8/parity-codec-3.5.4/src/joiner.rs /home/yijie/.cargo/registry/src/mirrors.ustc.edu.cn-61ef6e0cd06fb9b8/parity-codec-3.5.4/src/keyedvec.rs
+
+/home/yijie/files/proj/bc/substrate/DaQiao/daqiao/runtime/wasm/target/wasm32-unknown-unknown/release/deps/parity_codec-695b312eca566b6d.d: /home/yijie/.cargo/registry/src/mirrors.ustc.edu.cn-61ef6e0cd06fb9b8/parity-codec-3.5.4/src/lib.rs /home/yijie/.cargo/registry/src/mirrors.ustc.edu.cn-61ef6e0cd06fb9b8/parity-codec-3.5.4/src/codec.rs /home/yijie/.cargo/registry/src/mirrors.ustc.edu.cn-61ef6e0cd06fb9b8/parity-codec-3.5.4/src/joiner.rs /home/yijie/.cargo/registry/src/mirrors.ustc.edu.cn-61ef6e0cd06fb9b8/parity-codec-3.5.4/src/keyedvec.rs
+
+/home/yijie/.cargo/registry/src/mirrors.ustc.edu.cn-61ef6e0cd06fb9b8/parity-codec-3.5.4/src/lib.rs:
+/home/yijie/.cargo/registry/src/mirrors.ustc.edu.cn-61ef6e0cd06fb9b8/parity-codec-3.5.4/src/codec.rs:
+/home/yijie/.cargo/registry/src/mirrors.ustc.edu.cn-61ef6e0cd06fb9b8/parity-codec-3.5.4/src/joiner.rs:
+/home/yijie/.cargo/registry/src/mirrors.ustc.edu.cn-61ef6e0cd06fb9b8/parity-codec-3.5.4/src/keyedvec.rs:

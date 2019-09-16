@@ -1,0 +1,8 @@
+/home/yijie/files/proj/bc/substrate/DaQiao/daqiao/runtime/wasm/target/release/deps/libsrml_support_procedural-7cf2254e210af893.so: /home/yijie/.cargo/git/checkouts/substrate-7e08433d4c370a21/cc1d67e/srml/support/procedural/src/lib.rs /home/yijie/.cargo/git/checkouts/substrate-7e08433d4c370a21/cc1d67e/srml/support/procedural/src/storage/mod.rs /home/yijie/.cargo/git/checkouts/substrate-7e08433d4c370a21/cc1d67e/srml/support/procedural/src/storage/impls.rs /home/yijie/.cargo/git/checkouts/substrate-7e08433d4c370a21/cc1d67e/srml/support/procedural/src/storage/transformation.rs
+
+/home/yijie/files/proj/bc/substrate/DaQiao/daqiao/runtime/wasm/target/release/deps/srml_support_procedural-7cf2254e210af893.d: /home/yijie/.cargo/git/checkouts/substrate-7e08433d4c370a21/cc1d67e/srml/support/procedural/src/lib.rs /home/yijie/.cargo/git/checkouts/substrate-7e08433d4c370a21/cc1d67e/srml/support/procedural/src/storage/mod.rs /home/yijie/.cargo/git/checkouts/substrate-7e08433d4c370a21/cc1d67e/srml/support/procedural/src/storage/impls.rs /home/yijie/.cargo/git/checkouts/substrate-7e08433d4c370a21/cc1d67e/srml/support/procedural/src/storage/transformation.rs
+
+/home/yijie/.cargo/git/checkouts/substrate-7e08433d4c370a21/cc1d67e/srml/support/procedural/src/lib.rs:
+/home/yijie/.cargo/git/checkouts/substrate-7e08433d4c370a21/cc1d67e/srml/support/procedural/src/storage/mod.rs:
+/home/yijie/.cargo/git/checkouts/substrate-7e08433d4c370a21/cc1d67e/srml/support/procedural/src/storage/impls.rs:
+/home/yijie/.cargo/git/checkouts/substrate-7e08433d4c370a21/cc1d67e/srml/support/procedural/src/storage/transformation.rs:
