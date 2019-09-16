@@ -1,7 +1,7 @@
 /// A runtime module template with necessary imports
 
 /// Feel free to remove or edit this file as needed.
-/// If you change the name of this file, make sure to update its references in runtime/src/lib.rs
+/// If you change the name of this file, make sure to update its references in runtime/src/lib_back.rs
 /// If you remove this file, you can remove those references
 
 

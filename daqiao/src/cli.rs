@@ -63,7 +63,6 @@ fn run_until_exit<T, C, E>(
 
 	let executor = runtime.executor();
 	informant::start(&service, exit.clone(), executor.clone());
-
 	let _ = runtime.block_on(e.into_exit());
 	exit_send.fire();
 

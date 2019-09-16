@@ -63,6 +63,19 @@ git = 'https://github.com/paritytech/substrate.git'
 package = 'substrate-transaction-pool'
 rev = 'cc1d67e973fd02c0c997b164ba516cf041bf21f1'
 
+[dependencies.kvdb-rocksdb1]
+git = "https://github.com/yijie37/kvdb-rocksdb-com.git"
+rev = '2355525093d46a99a435dc25bd24a24114946e11'
+
+[dependencies.parity-ethereum]
+path = './bridge/parity-ethereum/parity'
+
+[dependencies.ethcore]
+path = './bridge/parity-ethereum/ethcore'
+
+[dependencies.parity-rpc]
+path = './bridge/parity-ethereum/rpc'
+
 [dependencies.qrml-tokens]
 path = './qrml/tokens'
 default-features = false
