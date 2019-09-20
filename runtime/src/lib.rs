@@ -56,6 +56,7 @@ pub type BlockNumber = u64;
 pub type Nonce = u64;
 
 extern crate qrml_tokens as tokens;
+extern crate fbridge;
 
 mod daqiao;
 
