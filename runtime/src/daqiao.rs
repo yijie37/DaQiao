@@ -7,9 +7,9 @@ use parity_codec::{Encode, Decode};
 use system::ensure_signed;
 use rstd::prelude::*;
 
-
 pub type TokenId<T> = <T as tokens::Trait>::TokenId;
 pub type ChainId = u32;
+pub type ExtTxID = Vec<u8>;
 pub type Hash = primitives::H256;
 
 pub trait Trait: system::Trait + tokens::Trait {
@@ -17,13 +17,13 @@ pub trait Trait: system::Trait + tokens::Trait {
 }
 
 #[derive(Encode, Decode, Default, Clone, PartialEq, Debug)]
-pub struct PledgeInfo <U, V>{
+pub struct PledgeInfo <U>{
   chain_id: ChainId,
-  ext_txid: Hash,
+  ext_txid: ExtTxID,
   account_id: U,
-  pledge_amount: V,
+  pledge_amount: u128,
   can_withdraw: bool,
-  withdraw_history: Vec<Hash>
+  withdraw_history: Vec<ExtTxID>
 }
 
 decl_storage! {
@@ -32,7 +32,7 @@ decl_storage! {
     ChainToken get(chain_token): map ChainId => Option<TokenId<T>>;
     
     // 外链质押txid => PledgeInfo
-    PledgeRecords get(pledge_records): map T::Hash => PledgeInfo<T::AccountId, T::TokenBalance>;
+    PledgeRecords get(pledge_records): map ExtTxID => PledgeInfo<T::AccountId>;
   }
 }
 
@@ -48,21 +48,21 @@ decl_module! {
     
     // 质押
     // TODO: 尝试自动验证
-    pub fn pledge(origin, chain_id: ChainId, ext_txid: Hash, value: T::TokenBalance) -> Result {
-      Self::_pledge(origin, chain_id, ext_txid, value)
+    pub fn pledge(origin, chain_id: ChainId, ext_txid: ExtTxID) -> Result {
+      Self::_pledge(origin, chain_id, ext_txid)
     }
     
     // 提现
-    pub fn withdraw(origin, chain_id: ChainId, ext_txid: Hash, value: T::TokenBalance) -> Result {
-      Self::_withdraw(origin, chain_id, ext_txid, value)
+    pub fn withdraw(origin, chain_id: ChainId, ext_txid: ExtTxID, ext_address: Vec<u8>,value: T::TokenBalance) -> Result {
+      Self::_withdraw(origin, chain_id, ext_txid, ext_address, value)
     }
   }
 }
 
 decl_event!(
   pub enum Event<T> where AccountId = <T as system::Trait>::AccountId, Balance = <T as tokens::Trait>::TokenBalance {
-    Pledged(ChainId, Hash, AccountId, Balance),
-    Withdrawn(ChainId, Hash, AccountId, Balance),
+    Pledged(ChainId, ExtTxID, AccountId, Balance),
+    Withdrawn(ChainId, ExtTxID, AccountId, Balance),
   }
 );
 
@@ -77,21 +77,45 @@ impl<T: Trait> Module<T> {
   }
   
   
-  pub fn _pledge(origin: T::Origin, chain_id: ChainId, ext_txid: Hash, value: T::TokenBalance) -> Result {
+  pub fn _pledge(origin: T::Origin, chain_id: ChainId, mut ext_txid: ExtTxID) -> Result {
     let sender = ensure_signed(origin)?;
     let token_id = match Self::chain_token(chain_id.clone()) {
       Some(t) => t,
       None => return Err("Chain id not exists.")
     };
-    
-    // TODO 验证外链ex_txid
-    
-    <tokens::Module<T>>::mint(token_id.clone(), sender.clone(), value)?;
-    Self::deposit_event(RawEvent::Pledged(chain_id, ext_txid, sender, value));
+    // 验证交易id是否被pledge过了
+    ensure!(!<PledgeRecords<T>>::exists(ext_txid.clone()), "ext_txid already pledged");
+
+    // 验证外链ex_txid
+    let mut value = 0;
+    if chain_id == 1 {
+      return Err("TODO @yijie");
+    } else if chain_id == 1 {
+      // TODO err handler
+      value = fbridge::fbridge::getPledgeAmount(&ext_txid).unwrap()
+    }
+
+    let pi = PledgeInfo {
+      chain_id: chain_id,
+      ext_txid: ext_txid.clone(),
+      account_id: sender.clone(),
+      pledge_amount: value,
+      can_withdraw: true,
+      withdraw_history: Vec::new(),
+    };
+
+    // TODO 编译通过
+    // mint 
+    // <tokens::Module<T>>::mint(token_id.clone(), sender.clone(), pi.pledge_amount)?;
+
+    // store pledge history
+    // <PledgeRecords<T>>::insert(ext_txid, pi);
+
+    // Self::deposit_event(RawEvent::Pledged(chain_id, ext_txid, sender, pi.pledge_amount));
     Ok(())
   }
   
-  pub fn _withdraw(origin: T::Origin, chain_id: ChainId, ext_txid: Hash, value: T::TokenBalance) -> Result {
+  pub fn _withdraw(origin: T::Origin, chain_id: ChainId, ext_txid: ExtTxID, ext_address: Vec<u8>, value: T::TokenBalance) -> Result {
     let sender = ensure_signed(origin) ?;
     let token_id = match Self::chain_token(chain_id.clone()) {
       Some(t) => t,
@@ -102,8 +126,25 @@ impl<T: Trait> Module<T> {
     let balance = <tokens::Module<T>>::balance_of(&(token_id.clone(), sender.clone()));
     let _ = balance.checked_sub(&value).ok_or("Not sufficient balance for withdraw")?;
     
-    // TODO 提现到外链
-  
+    ensure!(<PledgeRecords<T>>::exists(ext_txid.clone()), "This ext_txid PledgeRecords does not exist"); 
+    let mut pi = <PledgeRecords<T>>::get(ext_txid.clone());
+    if !pi.can_withdraw {
+        return Err("This ext_txid can not be withdraw");
+    }
+    if pi.account_id != sender.clone() {
+        return Err("This sender can not withdraw");
+    }
+
+    // TODO err handler
+    if chain_id == 1 {
+      return Err("TODO @yijie");
+    } else if chain_id == 1 {
+      let res = fbridge::fbridge::withdraw(&ext_address, pi.pledge_amount);
+    }
+
+    pi.can_withdraw = false;
+    pi.pledge_amount = 0;
+    <PledgeRecords<T>>::insert(ext_txid.clone(), pi);
     <tokens::Module<T>>::burn(token_id, sender.clone(), value)?;
     Self::deposit_event(RawEvent::Withdrawn(chain_id, ext_txid, sender, value));
     Ok(())
