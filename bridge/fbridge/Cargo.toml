@@ -19,3 +19,7 @@ default_features = false
 git = 'https://github.com/paritytech/substrate.git'
 package = 'sr-std'
 rev = 'cc1d67e973fd02c0c997b164ba516cf041bf21f1'
+
+[dependencies.qrml-tokens]
+default_features = false
+path = '../../qrml/tokens'

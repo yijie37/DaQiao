@@ -2,7 +2,7 @@
 extern crate qrml_tokens as tokens;
 
 use support::{decl_module, decl_storage, decl_event, StorageMap, dispatch::Result, ensure};
-use runtime_primitives::traits::CheckedSub;
+use runtime_primitives::traits::{CheckedSub, Zero};
 use parity_codec::{Encode, Decode};
 use system::ensure_signed;
 use rstd::prelude::*;
@@ -10,18 +10,18 @@ use rstd::prelude::*;
 pub type TokenId<T> = <T as tokens::Trait>::TokenId;
 pub type ChainId = u32;
 pub type ExtTxID = Vec<u8>;
-pub type Hash = primitives::H256;
+//pub type Hash = primitives::H256;
 
 pub trait Trait: system::Trait + tokens::Trait {
   type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
 }
 
 #[derive(Encode, Decode, Default, Clone, PartialEq, Debug)]
-pub struct PledgeInfo <U>{
+pub struct PledgeInfo <U, V>{
   chain_id: ChainId,
   ext_txid: ExtTxID,
   account_id: U,
-  pledge_amount: u128,
+  pledge_amount: V,
   can_withdraw: bool,
   withdraw_history: Vec<ExtTxID>
 }
@@ -30,9 +30,9 @@ decl_storage! {
   trait Store for Module<T: Trait> as Daqiao {
     // 外链id => token id
     ChainToken get(chain_token): map ChainId => Option<TokenId<T>>;
-    
+
     // 外链质押txid => PledgeInfo
-    PledgeRecords get(pledge_records): map ExtTxID => PledgeInfo<T::AccountId>;
+    PledgeRecords get(pledge_records): map ExtTxID => PledgeInfo<T::AccountId, T::TokenBalance>;
   }
 }
 
@@ -45,40 +45,41 @@ decl_module! {
     pub fn register(origin, chain_id: ChainId, token_id: TokenId<T>) -> Result {
       Self::_register(origin, chain_id, token_id)
     }
-    
+
     // 质押
-    // TODO: 尝试自动验证
-    pub fn pledge(origin, chain_id: ChainId, ext_txid: ExtTxID) -> Result {
-      Self::_pledge(origin, chain_id, ext_txid)
+    pub fn pledge(origin, chain_id: ChainId, ext_txid: ExtTxID, amount: T::TokenBalance, reciever: T::AccountId) -> Result {
+      Self::_pledge(origin, chain_id, ext_txid, amount, reciever)
     }
-    
+
     // 提现
-    pub fn withdraw(origin, chain_id: ChainId, ext_txid: ExtTxID, ext_address: Vec<u8>,value: T::TokenBalance) -> Result {
-      Self::_withdraw(origin, chain_id, ext_txid, ext_address, value)
+    pub fn withdraw(origin, chain_id: ChainId, ext_txid: ExtTxID, ext_address: Vec<u8>) -> Result {
+      Self::_withdraw(origin, chain_id, ext_txid, ext_address)
     }
+
   }
 }
 
 decl_event!(
   pub enum Event<T> where AccountId = <T as system::Trait>::AccountId, Balance = <T as tokens::Trait>::TokenBalance {
     Pledged(ChainId, ExtTxID, AccountId, Balance),
-    Withdrawn(ChainId, ExtTxID, AccountId, Balance),
+    Withdrawn(ChainId, ExtTxID, AccountId, Balance, Vec<u8>),
   }
 );
 
 impl<T: Trait> Module<T> {
-  
+
   fn _register(origin: T::Origin, chain_id: ChainId, token_id: TokenId<T>) -> Result {
-    // TODO sudo权限验证
     let _ = ensure_signed(origin)?;
     ensure!(!<ChainToken<T>>::exists(chain_id.clone()), "ChainId already exists.");
     <ChainToken<T>>::insert(chain_id, token_id);
     Ok(())
   }
-  
-  
-  pub fn _pledge(origin: T::Origin, chain_id: ChainId, mut ext_txid: ExtTxID) -> Result {
+
+
+  fn _pledge(origin: T::Origin, chain_id: ChainId, ext_txid: ExtTxID, amount: T::TokenBalance, reciever: T::AccountId) -> Result {
     let sender = ensure_signed(origin)?;
+    // TODO 验证 sender在admin list中
+
     let token_id = match Self::chain_token(chain_id.clone()) {
       Some(t) => t,
       None => return Err("Chain id not exists.")
@@ -86,67 +87,48 @@ impl<T: Trait> Module<T> {
     // 验证交易id是否被pledge过了
     ensure!(!<PledgeRecords<T>>::exists(ext_txid.clone()), "ext_txid already pledged");
 
-    // 验证外链ex_txid
-    let mut value = 0;
-    if chain_id == 1 {
-      return Err("TODO @yijie");
-    } else if chain_id == 1 {
-      // TODO err handler
-      value = fbridge::fbridge::getPledgeAmount(&ext_txid).unwrap()
-    }
-
     let pi = PledgeInfo {
-      chain_id: chain_id,
+      chain_id: chain_id.clone(),
       ext_txid: ext_txid.clone(),
-      account_id: sender.clone(),
-      pledge_amount: value,
+      account_id: reciever.clone(),
+      pledge_amount: amount,
       can_withdraw: true,
       withdraw_history: Vec::new(),
     };
 
-    // TODO 编译通过
-    // mint 
-    // <tokens::Module<T>>::mint(token_id.clone(), sender.clone(), pi.pledge_amount)?;
+    // mint
+     <tokens::Module<T>>::mint(token_id.clone(), reciever.clone(), amount.clone())?;
 
     // store pledge history
-    // <PledgeRecords<T>>::insert(ext_txid, pi);
+     <PledgeRecords<T>>::insert(ext_txid.clone(), pi);
 
-    // Self::deposit_event(RawEvent::Pledged(chain_id, ext_txid, sender, pi.pledge_amount));
+     Self::deposit_event(RawEvent::Pledged(chain_id, ext_txid, reciever, amount));
     Ok(())
   }
   
-  pub fn _withdraw(origin: T::Origin, chain_id: ChainId, ext_txid: ExtTxID, ext_address: Vec<u8>, value: T::TokenBalance) -> Result {
+  fn _withdraw(origin: T::Origin, chain_id: ChainId, ext_txid: ExtTxID, ext_address: Vec<u8>) -> Result {
     let sender = ensure_signed(origin) ?;
+    ensure!(<PledgeRecords<T>>::exists(ext_txid.clone()), "This ext_txid PledgeRecords does not exist");
+
     let token_id = match Self::chain_token(chain_id.clone()) {
       Some(t) => t,
       None => return Err("Chain id not exists.")
     };
-  
+    let mut pi = <PledgeRecords<T>>::get(ext_txid.clone());
+    let amount = pi.pledge_amount;
+
     // 检查余额是否足够
     let balance = <tokens::Module<T>>::balance_of(&(token_id.clone(), sender.clone()));
-    let _ = balance.checked_sub(&value).ok_or("Not sufficient balance for withdraw")?;
+    let _ = balance.checked_sub(&amount).ok_or("Not sufficient balance for withdraw")?;
     
-    ensure!(<PledgeRecords<T>>::exists(ext_txid.clone()), "This ext_txid PledgeRecords does not exist"); 
-    let mut pi = <PledgeRecords<T>>::get(ext_txid.clone());
-    if !pi.can_withdraw {
-        return Err("This ext_txid can not be withdraw");
-    }
-    if pi.account_id != sender.clone() {
-        return Err("This sender can not withdraw");
-    }
-
-    // TODO err handler
-    if chain_id == 1 {
-      return Err("TODO @yijie");
-    } else if chain_id == 1 {
-      let res = fbridge::fbridge::withdraw(&ext_address, pi.pledge_amount);
-    }
+    ensure!(pi.can_withdraw && pi.account_id == sender.clone(), "Withdraw failed.");
 
     pi.can_withdraw = false;
-    pi.pledge_amount = 0;
+    pi.pledge_amount = Zero::zero();
+
     <PledgeRecords<T>>::insert(ext_txid.clone(), pi);
-    <tokens::Module<T>>::burn(token_id, sender.clone(), value)?;
-    Self::deposit_event(RawEvent::Withdrawn(chain_id, ext_txid, sender, value));
+    <tokens::Module<T>>::burn(token_id, sender.clone(), amount)?;
+    Self::deposit_event(RawEvent::Withdrawn(chain_id, ext_txid, sender, amount, ext_address));
     Ok(())
   }
 }

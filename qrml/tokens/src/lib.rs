@@ -17,7 +17,7 @@ use sr_std::prelude::*;
 pub trait Trait: system::Trait {
   type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
   type TokenId: Parameter + Default + Bounded + SimpleArithmetic;
-  type TokenBalance: Parameter + Member + SimpleArithmetic + Default + Copy + As<usize> + As<u64>;
+  type TokenBalance: Parameter + Member + SimpleArithmetic + Default + Copy + As<usize> + As<u64> + As<u128>;
 }
 
 type Symbol = Vec<u8>;
